@@ -4,7 +4,7 @@ Grid::Grid()
 {
     for(int i = 0; i < NUM_GRID; i++)
     {
-        for(int j = 0; j< NUM_GRID; j++)
+        for(int j = 0; j < NUM_GRID; j++)
         {
             grid[i][j] = nullptr;
             privategrid[i][j] = 0;
@@ -27,7 +27,6 @@ void Grid::execute()
             }
         }
     }
-
 }
 void Grid::draw(Graphic_Manager* pGM)
 {
@@ -49,6 +48,7 @@ void Grid::draw(Graphic_Manager* pGM)
     
 }
 
+//Still getting segfault from stupid function don't know why
 void Grid::checkBelow(sf::Vector2i pos_grid)
 {
     int i = pos_grid.x;
@@ -56,33 +56,35 @@ void Grid::checkBelow(sf::Vector2i pos_grid)
 
     std::cout << "i: " << i << " j: " << j << std::endl;
     
-    //If block below is empty, continue downwards
-    if(privategrid[i][j + 1] == 0 && j < NUM_GRID - 30)
-    {
-        //Verifies blocks below to see if the element wouldn't pass right into another because of gravity (gravity makes the elements travel more than one block per frame)
-        int k = 1;
-        while(privategrid[i][j+k+1] == 0 && k <= grid[i][j]->getVel() && j+k < 170)
+        //If block below is empty, continue downwards
+        if(privategrid[i][j + 1] == 0 && j < NUM_GRID - 30)
         {
-            k++;
+            std::cout << "aaaa " ;
+            //Verifies blocks below to see if the element wouldn't pass right into another because of gravity (gravity makes the elements travel more than one block per frame)
+            int k = 1;
+            while(privategrid[i][j+k+1] == 0 && k <= grid[i][j]->getVel() && j+k < 170)
+            {
+                k++;
+            }
+            grid[i][j]->update_vel();
+            grid[i][j + k] = grid[i][j];
+            grid[i][j] = nullptr; 
         }
-        grid[i][j]->update_vel();
-        grid[i][j + k] = grid[i][j];
-        grid[i][j] = nullptr; 
-    }
-    //If block below isn`t empty, check diagonally
-    else if(privategrid[i][j+1] != 0)
-    {
-        if(privategrid[i+1][j+1] == 0)
+        //If block below isn`t empty, check diagonally
+        else if(privategrid[i][j+1] != 0)
         {
-            grid[i + 1][j + 1] = grid[i][j];
-            grid[i][j] = nullptr;
+            if(privategrid[i+1][j+1] == 0)
+            {
+                grid[i + 1][j + 1] = grid[i][j];
+                grid[i][j] = nullptr;
+            }
+            else if(privategrid[i-1][j+1] == 0)
+            {
+                grid[i - 1][j + 1] = grid[i][j];
+                grid[i][j] = nullptr;
+            }                  
         }
-        else if(privategrid[i-1][j+1] == 0)
-        {
-            grid[i - 1][j + 1] = grid[i][j];
-            grid[i][j] = nullptr;
-        }                  
-    }
+    
 
 }
 
