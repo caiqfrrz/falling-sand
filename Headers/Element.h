@@ -13,7 +13,7 @@ protected:
     float energy;
     bool isFalling;
     const int dispersionRate;
-    short int id;
+    const int id;
 public:
     Element(int dr, short int id, Grid* pG);
     ~Element();

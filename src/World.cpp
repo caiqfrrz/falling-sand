@@ -8,6 +8,7 @@ pGM(Graphic_Manager::get_instance())
         //newdwdw.setSize(sf::Vector2f(30, 30));
        // newdwdw.setPosition(sf::Vector2f(200, 300));
        // newdwdw.setFillColor(sf::Color::White);
+        grid = Grid();
         execute();
     }
 

@@ -3,14 +3,15 @@
 #include "../Headers/Grid.h"
 
 Element::Element(int dr, short int id, Grid* pG):
-isFalling(true),
-energy(0),
-velocity(0),
+body(sf::Vector2f(4, 4)), // Assuming default initialization or provide a suitable constructor
 pGrid(pG),
+velocity(0),
+energy(0),
+isFalling(true),
 dispersionRate(dr),
 id(id)
 {
-    body.setSize(sf::Vector2f(4 ,4));
+    
 }
 Element::~Element()
 {

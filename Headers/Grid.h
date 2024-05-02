@@ -14,7 +14,7 @@ class Grid
 {
 private:
     Element* grid[NUM_GRID][NUM_GRID + 1];
-    int privategrid[NUM_GRID][NUM_GRID + 1];
+    std::array<std::array<int, NUM_GRID>, NUM_GRID + 1> privategrid;
 
 public:
     Grid();
@@ -23,5 +23,6 @@ public:
     void execute();
     void place(int id, sf::Vector2i position);
     void draw(Graphic_Manager* pGM);
-    void checkBelow(sf::Vector2i pos_grid);
+    bool checkBelow(sf::Vector2i pos_grid);
+    void goSide(sf::Vector2i pos_grid, bool direction);
 };

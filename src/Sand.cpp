@@ -15,7 +15,5 @@ Sand::~Sand()
 
 void Sand::update(sf::Vector2i pos_grid)
 {
-    std::cout << "pos_grid.x: " << pos_grid.x << std::endl;
-    std::cout << "pos_grid.y: " << pos_grid.y << std::endl;
     pGrid->checkBelow(pos_grid);
 }
