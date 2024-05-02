@@ -1,0 +1,275 @@
+#include "src/World.h"
+
+int main()
+{
+    std::cout << "saca";
+    World game;
+    return 0;
+}
+#pragma once
+#include "../Managers/Graphic_Manager.h"
+#include "Grid.h"
+
+
+#include <iostream>
+
+
+class World
+{
+private:
+    Graphic_Manager* pGM;
+    Grid grid;
+public:
+    World();
+    ~World();
+    void execute();
+    void loop_event();
+};
+#include <iostream>
+#include "World.h"
+
+World::World():
+    pGM(Graphic_Manager::get_instance())
+    {
+        execute();
+    }
+
+World::~World()
+    {
+        pGM = nullptr;
+    }
+
+void World::execute()
+{
+        while(pGM->iswindow_opened())
+        {
+            loop_event();
+            grid.execute();
+
+            pGM->get_window()->clear();
+            pGM->get_window()->display();
+        }
+}
+void World::loop_event()
+{
+    sf::Event event;
+
+            while(pGM->get_window()->pollEvent(event))
+            {
+                if(event.type == sf::Event::Closed)
+                    pGM->get_window()->close();
+                
+                if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+                {
+                    sf::Vector2i localPosition = sf::Mouse::getPosition(*(pGM->get_window()));
+
+                    grid.place(1, localPosition);
+                    grid.draw(pGM);
+                }
+            }
+            
+}
+#pragma once
+#include "Element.h"
+
+class Sand : public Element
+{
+private:
+public:
+    Sand(sf::Vector2f pos);
+    ~Sand();
+};
+#include "Sand.h"
+
+Sand::Sand(sf::Vector2f pos):
+Element(1, 1)
+{
+    body.setPosition(pos);
+    body.setFillColor(sf::Color::Yellow);
+}
+Sand::~Sand()
+{
+
+}
+#pragma once
+#include <iostream>
+#include <array>
+#include <SFML/Graphics.hpp>
+
+#include "../Managers/Graphic_Manager.h"
+#include "Sand.h"
+
+#define NUM_GRID 400
+
+class Grid
+{
+private:
+    std::array<std::array<int, NUM_GRID>, NUM_GRID + 1> grid;
+
+public:
+    Grid();
+    ~Grid();
+    void execute();
+    void place(int id, sf::Vector2i position);
+    void draw(Graphic_Manager* pGM);
+};
+#include "Grid.h"
+
+Grid::Grid()
+{
+    for(int i = 0; i < NUM_GRID; i++)
+    {
+        for(int j = 0; j< NUM_GRID; j++)
+        {
+            grid[i][j] = 0;
+        }
+    }
+
+    for(int i = 0; i < NUM_GRID; i++)
+    {
+        grid[400][i] = 2;
+    }
+
+}
+
+Grid::~Grid()
+{
+
+}
+void Grid::execute()
+{
+    for(int i = 0; i < NUM_GRID; i++)
+    {
+        for(int j = 0; j< NUM_GRID; j++)
+        {
+            if(grid[i][j] == 1)
+            {
+                if(grid[i][j + 1] == 0)
+                {
+                    grid[i][j] = 0;
+                    grid[i][j + 1] = 1;
+                }
+            }
+        }
+    }
+
+}
+void Grid::draw(Graphic_Manager* pGM)
+{
+    for(int i = 0; i < NUM_GRID; i++)
+    {
+        for(int j = 0; j< NUM_GRID; j++)
+        {
+            if(grid[i][j] == 1)
+            {
+                Sand new_sand = Sand(sf::Vector2f( 2 * i, 2 * j));
+                pGM->draw(&new_sand);
+            }
+        }
+    }
+}
+
+void Grid::place(int id, sf::Vector2i position)
+{
+    grid[position.x][position.y] = id;
+    std::cout << "teste";
+}
+#include "../Managers/Graphic_Manager.h"
+
+#define WIDTH_WINDOW 800
+#define HEIGHT_WINDOW 800
+
+Graphic_Manager* Graphic_Manager::instance(nullptr);
+
+Graphic_Manager::Graphic_Manager():
+window(new sf::RenderWindow(sf::VideoMode(WIDTH_WINDOW, HEIGHT_WINDOW), "Falling Sand"))
+{
+    window->setFramerateLimit(60);
+    
+}
+Graphic_Manager::~Graphic_Manager()
+{
+    delete window;
+}
+
+Graphic_Manager* Graphic_Manager::get_instance()
+{
+    if(!instance)
+    {
+        instance = new Graphic_Manager();
+    }
+    return instance;
+}
+const bool Graphic_Manager::iswindow_opened() const
+{
+    if(window->isOpen())
+    {
+        return true;
+    }
+    else
+        return false;
+}
+sf::RenderWindow* Graphic_Manager::get_window()
+{
+    return window;
+}
+
+void Graphic_Manager::draw(Element* el)
+{
+    if(el != nullptr)
+    {
+        window->draw(*(el->get_body()));
+    }
+}
+#pragma once
+#include <SFML/Graphics.hpp>
+
+class Element
+{
+protected:
+    sf::RectangleShape body;
+    int dispersionRate;
+    short int id;
+public:
+    Element(int dr, short int id);
+    ~Element();
+    sf::RectangleShape* get_body();
+};
+#include <iostream>
+#include "Element.h"
+
+Element::Element(int dr, short int id):
+dispersionRate(dr),
+id(id)
+{
+    body.setSize(sf::Vector2f(2 ,2));
+}
+Element::~Element()
+{
+
+}
+sf::RectangleShape* Element::get_body()
+{
+    return &body;
+}
+#pragma once
+
+#include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
+#include <SFML/Window/Mouse.hpp>
+
+#include "../src/Element.h"
+
+class Graphic_Manager
+{
+private:
+    sf::RenderWindow* window;
+    static Graphic_Manager* instance;
+    Graphic_Manager();
+public:
+    ~Graphic_Manager();
+    static Graphic_Manager* get_instance();
+    const bool iswindow_opened() const;
+    sf::RenderWindow* get_window();
+    void draw(Element* el);
+};
