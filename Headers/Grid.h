@@ -14,12 +14,10 @@ class Grid
 {
 private:
     Element* grid[NUM_GRID][NUM_GRID + 1];
-    std::array<std::array<int, NUM_GRID>, NUM_GRID + 1> privategrid;
 
 public:
     Grid();
     ~Grid();
-    int** get_privategrid();
     void execute();
     void place(int id, sf::Vector2i position);
     void draw(Graphic_Manager* pGM);

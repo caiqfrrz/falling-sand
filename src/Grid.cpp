@@ -7,7 +7,6 @@ Grid::Grid()
         for(int j = 0; j < NUM_GRID; j++)
         {
             grid[i][j] = nullptr;
-            privategrid[i][j] = 0;
         }
     }
 }
@@ -21,7 +20,7 @@ void Grid::execute()
     {
         for(int j = 0; j < NUM_GRID; j++)
         {
-            if(privategrid[i][j] != 0)
+            if(grid[i][j] != 0)
             {
                 grid[i][j]->update(sf::Vector2i(i, j));
             }
@@ -38,11 +37,8 @@ void Grid::draw(Graphic_Manager* pGM)
             {
                 grid[i][j]->update_pos(sf::Vector2i(i, j));
                 pGM->draw(grid[i][j]);
-                privategrid[i][j] = grid[i][j]->getId();
+                grid[i][j]->reset();
             }
-            else
-                privategrid[i][j] = 0;
-            
         }
     }
     
@@ -55,11 +51,11 @@ bool Grid::checkBelow(sf::Vector2i pos_grid)
     int j = pos_grid.y;
     
         //If block below is empty, continue downwards
-        if(this->privategrid[i][j + 1] == 0 && j < NUM_GRID - 30)
+        if(this->grid[i][j + 1] == 0 && j < NUM_GRID - 30)
         {
             //Verifies blocks below to see if the element wouldn't pass right into another because of gravity (gravity makes the elements travel more than one block per frame)
             int k = 1;
-            while(this->privategrid[i][j+k+1] == 0 && k <= grid[i][j]->getVel() && j+k < 170)
+            while(this->grid[i][j+k+1] == 0 && k <= grid[i][j]->getVel() && j+k < 170)
             {
                 k++;
             }
@@ -70,22 +66,23 @@ bool Grid::checkBelow(sf::Vector2i pos_grid)
             return true;
         }
         //If block below isn`t empty, check diagonally
-        else if(privategrid[i][j+1] != 0)
+        else if(grid[i][j+1] != 0)
         {
-            if(privategrid[i+1][j+1] == 0)
+            if(grid[i+1][j+1] == 0)
             {
                 grid[i + 1][j + 1] = grid[i][j];
                 grid[i][j] = nullptr;
                 return true;
             }
-            else if(privategrid[i-1][j+1] == 0)
+            else if(grid[i-1][j+1] == 0)
             {
                 grid[i - 1][j + 1] = grid[i][j];
                 grid[i][j] = nullptr;
                 return true;
-            }                  
+            }  
+            return false;                
         }
-        return false;
+        
 }
 void Grid::goSide(sf::Vector2i pos_grid, bool direction)
 {
@@ -94,12 +91,12 @@ void Grid::goSide(sf::Vector2i pos_grid, bool direction)
 
     if(direction)
     {
-        if(privategrid[i + 1][j] == 0)
+        if(grid[i + 1][j] == 0)
         {
             grid[i + 1][j] = grid[i][j];
             grid[i][j] = nullptr;
         }
-        else if(privategrid[i - 1][j] == 0)
+        else if(grid[i - 1][j] == 0)
         {
             grid[i - 1][j] = grid[i][j];
             grid[i][j] = nullptr;
@@ -107,12 +104,12 @@ void Grid::goSide(sf::Vector2i pos_grid, bool direction)
     }
     else
     {
-        if(privategrid[i - 1][j] == 0)
+        if(grid[i - 1][j] == 0)
         {
             grid[i - 1][j] = grid[i][j];
             grid[i][j] = nullptr;
         }
-        else if(privategrid[i + 1][j] == 0)
+        else if(grid[i + 1][j] == 0)
         {
             grid[i + 1][j] = grid[i][j];
             grid[i][j] = nullptr;

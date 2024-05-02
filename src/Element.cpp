@@ -8,6 +8,7 @@ pGrid(pG),
 velocity(0),
 energy(0),
 isFalling(true),
+hasMoved(false),
 dispersionRate(dr),
 id(id)
 {

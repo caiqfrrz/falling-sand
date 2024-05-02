@@ -4,6 +4,7 @@
 class Sand : public Element
 {
 private:
+    bool direction;
 public:
     Sand(sf::Vector2f pos, Grid* pG = nullptr);
     ~Sand();

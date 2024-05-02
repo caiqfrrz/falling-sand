@@ -15,5 +15,8 @@ Sand::~Sand()
 
 void Sand::update(sf::Vector2i pos_grid)
 {
-    pGrid->checkBelow(pos_grid);
+    if(!hasMoved)
+        pGrid->checkBelow(pos_grid);
+
+    hasMoved = true;
 }
