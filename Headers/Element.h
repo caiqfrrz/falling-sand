@@ -21,9 +21,9 @@ public:
     virtual void update(sf::Vector2i pos_grid) = 0;
     void reset(){hasMoved = false;}
     void update_pos(sf::Vector2i pos_grid){body.setPosition(sf::Vector2f(pos_grid.x * 4, (pos_grid.y) * 4));}
-    const int getId() const {return id;};
+    int getId(){return id;};
     void update_vel();
-    const int getDispersionRate();
+    int getDispersionRate();
     void setFalling(bool f);
     void setVel(int v){velocity = v;}
     int getVel(){return round(velocity);}

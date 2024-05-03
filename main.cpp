@@ -2,7 +2,8 @@
 
 int main()
 {
-    std::cout << "saca";
+    std::cout << "aaaaaa";
     World game;
+    
     return 0;
 }

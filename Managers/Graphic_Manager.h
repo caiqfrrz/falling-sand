@@ -16,7 +16,7 @@ private:
 public:
     ~Graphic_Manager();
     static Graphic_Manager* get_instance();
-    const bool iswindow_opened() const;
+    const bool iswindow_opened();
     sf::RenderWindow* get_window();
     void draw(Element* el);
 };

@@ -22,7 +22,7 @@ sf::RectangleShape* Element::get_body()
 {
     return &body;
 }
-const int Element::getDispersionRate()
+int Element::getDispersionRate()
 {
     return dispersionRate;
 }

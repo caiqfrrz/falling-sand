@@ -2,6 +2,7 @@
 
 Grid::Grid()
 {
+    std::cout << "oiiii";
     for(int i = 0; i < NUM_GRID; i++)
     {
         for(int j = 0; j < NUM_GRID; j++)
@@ -9,6 +10,7 @@ Grid::Grid()
             grid[i][j] = nullptr;
         }
     }
+    std::cout << "oiiii";
 }
 Grid::~Grid()
 {
@@ -82,6 +84,7 @@ bool Grid::checkBelow(sf::Vector2i pos_grid)
             }  
             return false;                
         }
+        return false;
         
 }
 void Grid::goSide(sf::Vector2i pos_grid, bool direction)
@@ -119,23 +122,26 @@ void Grid::goSide(sf::Vector2i pos_grid, bool direction)
 
 void Grid::place(int id, sf::Vector2i position)
 {
-    if(id == 1)
+    switch(id)
     {
-        Sand* new_sand = new Sand(sf::Vector2f(position.x * 4, position.y * 4), this);
-        grid[position.x][position.y] = static_cast<Element*> (new_sand);
-    }
+        case 1:
+        {
+            Sand* new_sand = new Sand(sf::Vector2f(position.x * 4, position.y * 4), this);
+            grid[position.x][position.y] = static_cast<Element*> (new_sand);
+            break;
+        }
 
-    else if (id == 2)
-    {
-        Water* new_water = new Water(sf::Vector2f(position.x * 4, position.y * 4), this);
-        grid[position.x][position.y] = static_cast<Element*> (new_water);
-    }
-    else if(id == 3)
-    {
-        for(int i = -2; i < 2; i++)
+        case 2:
+        {
+            Water* new_water = new Water(sf::Vector2f(position.x * 4, position.y * 4), this);
+            grid[position.x][position.y] = static_cast<Element*> (new_water);
+            break;
+        }
+        case 3:
         {
             Rock* new_rock = new Rock(sf::Vector2f(position.x * 4, position.y * 4), this);
-            grid[position.x + i][position.y + i] = static_cast<Element*> (new_rock);
+            grid[position.x][position.y] = static_cast<Element*> (new_rock);
+            break;
         }
     }
 

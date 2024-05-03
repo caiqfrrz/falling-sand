@@ -24,7 +24,7 @@ Graphic_Manager* Graphic_Manager::get_instance()
     }
     return instance;
 }
-const bool Graphic_Manager::iswindow_opened() const
+const bool Graphic_Manager::iswindow_opened()
 {
     if(window->isOpen())
     {
