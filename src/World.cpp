@@ -57,5 +57,14 @@ void World::loop_event()
 
                     grid.place(2, sf::Vector2i(gridX, gridY));
                 }
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+            {
+                sf::Vector2i localPosition = sf::Mouse::getPosition(*(pGM->get_window()));
+
+                    int gridX = floor(localPosition.x / 4);
+				    int gridY = floor(localPosition.y / 4);
+
+                grid.place(3, sf::Vector2i(gridX, gridY));
+            }
             
 }

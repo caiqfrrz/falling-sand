@@ -22,7 +22,7 @@ void Water::update(sf::Vector2i pos_grid)
 {
     if(!hasMoved)
         if(!pGrid->checkBelow(pos_grid))
-            pGrid->goSide(pos_grid, direction);
+            pGrid->goSide(pos_grid, false);
 
     hasMoved = true;
 }

@@ -7,6 +7,7 @@
 #include "Sand.h"
 #include "Element.h"
 #include "Water.h"
+#include "Rock.h"
 
 #define NUM_GRID 200
 

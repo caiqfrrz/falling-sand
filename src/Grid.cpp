@@ -51,11 +51,11 @@ bool Grid::checkBelow(sf::Vector2i pos_grid)
     int j = pos_grid.y;
     
         //If block below is empty, continue downwards
-        if(this->grid[i][j + 1] == 0 && j < NUM_GRID - 30)
+        if(this->grid[i][j + 1] == 0 && j < NUM_GRID)
         {
             //Verifies blocks below to see if the element wouldn't pass right into another because of gravity (gravity makes the elements travel more than one block per frame)
             int k = 1;
-            while(this->grid[i][j+k+1] == 0 && k <= grid[i][j]->getVel() && j+k < 170)
+            while(this->grid[i][j+k+1] == 0 && k <= grid[i][j]->getVel() && j+k < NUM_GRID)
             {
                 k++;
             }
@@ -129,6 +129,14 @@ void Grid::place(int id, sf::Vector2i position)
     {
         Water* new_water = new Water(sf::Vector2f(position.x * 4, position.y * 4), this);
         grid[position.x][position.y] = static_cast<Element*> (new_water);
+    }
+    else if(id == 3)
+    {
+        for(int i = -2; i < 2; i++)
+        {
+            Rock* new_rock = new Rock(sf::Vector2f(position.x * 4, position.y * 4), this);
+            grid[position.x + i][position.y + i] = static_cast<Element*> (new_rock);
+        }
     }
 
 }
