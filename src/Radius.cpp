@@ -24,7 +24,7 @@ void Radius::execute()
 }
 void Radius::sizeDown()
 {
-    if(size > 30)
+    if(size > 20)
         size -= 10;
     
     body.setRadius(size);
