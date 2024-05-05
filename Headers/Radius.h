@@ -1,5 +1,6 @@
 #pragma once
 #include "../Managers/Graphic_Manager.h"
+#include <math.h>
 
 class Radius
 {
@@ -14,5 +15,6 @@ public:
     sf::CircleShape* getBody();
     void sizeUp();
     void sizeDown();
+    bool verifiesInside(sf::Vector2f position);
     int getRadius();
 };

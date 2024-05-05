@@ -42,6 +42,20 @@ int Radius::getRadius()
 {
     return size;
 }
+bool Radius::verifiesInside(sf::Vector2f position)
+{
+    float distX = position.x - body.getPosition().x;
+    float distY = position.y - body.getPosition().y;
+
+    float distance = sqrt(pow(distX, 2) + pow(distY, 2));
+
+    if(distance < size)
+    {
+        return true;
+    }
+    else
+        return false;
+}
 sf::CircleShape* Radius::getBody()
 {
     return &body;

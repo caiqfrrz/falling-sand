@@ -122,28 +122,29 @@ void Grid::goSide(sf::Vector2i pos_grid, bool direction)
 
 void Grid::place(int id, sf::Vector2i position)
 {
-    switch(id)
-    {
-        case 1:
+    if(grid[position.x][position.y] == nullptr)
+        switch(id)
         {
-            Sand* new_sand = new Sand(sf::Vector2f(position.x * 4, position.y * 4), this);
-            grid[position.x][position.y] = static_cast<Element*> (new_sand);
-            break;
-        }
+            case 1:
+            {
+                Sand* new_sand = new Sand(sf::Vector2f(position.x * 4, position.y * 4), this);
+                grid[position.x][position.y] = static_cast<Element*> (new_sand);
+                break;
+            }
 
-        case 2:
-        {
-            Water* new_water = new Water(sf::Vector2f(position.x * 4, position.y * 4), this);
-            grid[position.x][position.y] = static_cast<Element*> (new_water);
-            break;
+            case 2:
+            {
+                Water* new_water = new Water(sf::Vector2f(position.x * 4, position.y * 4), this);
+                grid[position.x][position.y] = static_cast<Element*> (new_water);
+                break;
+            }
+            case 3:
+            {
+                Rock* new_rock = new Rock(sf::Vector2f(position.x * 4, position.y * 4), this);
+                grid[position.x][position.y] = static_cast<Element*> (new_rock);
+                break;
+            }
         }
-        case 3:
-        {
-            Rock* new_rock = new Rock(sf::Vector2f(position.x * 4, position.y * 4), this);
-            grid[position.x][position.y] = static_cast<Element*> (new_rock);
-            break;
-        }
-    }
 
 }
 
