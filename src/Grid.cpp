@@ -8,6 +8,7 @@ Grid::Grid()
         for(int j = 0; j < NUM_GRID; j++)
         {
             grid[i][j] = nullptr;
+            priv_grid[i][j] = 0;
         }
     }
     std::cout << "oiiii";
@@ -21,9 +22,9 @@ void Grid::execute()
 {
     for(int i = NUM_GRID - 1; i >= 0; i--)
     {
-        for(int j = 0; j < NUM_GRID; j++)
+        for(int j = NUM_GRID - 1; j >= 0; j--)
         {
-            if(grid[j][i] != 0)
+            if(priv_grid[j][i] != 0)
             {
                 grid[j][i]->update(sf::Vector2i(j, i));
             }
@@ -41,7 +42,10 @@ void Grid::draw(Graphic_Manager* pGM)
                 grid[i][j]->update_pos(sf::Vector2i(i, j));
                 pGM->draw(grid[i][j]);
                 grid[i][j]->reset();
+                priv_grid[i][j] = grid[i][j]->getId();
             }
+            else
+                priv_grid[i][j] = 0;
         }
     }
     
@@ -52,13 +56,12 @@ bool Grid::checkBelow(sf::Vector2i pos_grid)
     int i = pos_grid.x;
     int j = pos_grid.y;
 
-    
         //If block below is empty, continue downwards
-        if(this->grid[i][j + 1] == nullptr && j < NUM_GRID)
+        if(grid[i][j + 1] == 0 && j < NUM_GRID)
         {
             //Verifies blocks below to see if the element wouldn't pass right into another because of gravity (gravity makes the elements travel more than one block per frame)
             int k = 1;
-            while(this->grid[i][j+k+1] == nullptr && k <= grid[i][j]->getVel() && j+k < NUM_GRID)
+            while(priv_grid[i][j+k+1] == 0 && k <= grid[i][j]->getVel() && j+k < NUM_GRID)
             {
                 k++;
             }
@@ -69,21 +72,31 @@ bool Grid::checkBelow(sf::Vector2i pos_grid)
             return true;
         }
         //If block below isn`t empty, check diagonally
-        else if(grid[i][j+1] != nullptr)
+        else if(grid[i][j+1] != 0)
         {
-
-                if(grid[i+1][j+1] == nullptr)
+                if(grid[i+1][j+1] == 0)
                 {
                     grid[i + 1][j + 1] = grid[i][j];
                     grid[i][j] = nullptr;
                     return true;
                 }
-                else if(grid[i-1][j+1] == nullptr)
+                else if(grid[i-1][j+1] == 0)
                 {
                     grid[i - 1][j + 1] = grid[i][j];
                     grid[i][j] = nullptr;
                     return true;
                 } 
+                if(grid[i][j+1]->getDensity() < grid[i][j]->getDensity())
+                {
+                    Element* temp = grid[i][j];
+                    grid[i][j] = grid[i][j + 1];
+                    grid[i][j + 1] = temp;
+                    
+                    temp = nullptr;
+                    delete temp;
+
+                    return true;
+                }
             
             return false;                
         }

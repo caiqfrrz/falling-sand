@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 Water::Water(sf::Vector2f pos, Grid* pG):
-Element(3, 2, pG)
+Element(3, 2, 1.0, pG)
 {
     int random = (int)rand() % 2;
     if(random)
