@@ -22,11 +22,11 @@ void Grid::execute()
 {
     for(int i = NUM_GRID - 1; i >= 0; i--)
     {
-        for(int j = NUM_GRID - 1; j >= 0; j--)
+        for(int j = 0; j < NUM_GRID ; j++)
         {
-            if(priv_grid[j][i] != 0)
+            if(priv_grid[i][j] != 0)
             {
-                grid[j][i]->update(sf::Vector2i(j, i));
+                grid[i][j]->update(sf::Vector2i(i, j));
             }
         }
     }

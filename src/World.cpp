@@ -40,21 +40,10 @@ void World::loop_event()
                     pGM->get_window()->close();
 
             }
-            //Get a way to make the radius work (something related to comparing if the grid points are inside the radius of the circle idk)
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
-                {
-                    for(int i = 0; i < NUM_GRID; i++)
-                    {
-                        for(int j = 0; j < NUM_GRID; j++)
-                        {
-                            if(radius.verifiesInside(sf::Vector2f(i * 4, j * 4)))
-                            {
-                                grid.place(1, sf::Vector2i(i, j));
-                            }
+            {
                 
-                        }
-                    }
-                }
+            }
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
                 {
                     for(int i = 0; i < NUM_GRID; i++)
