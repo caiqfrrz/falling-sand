@@ -42,7 +42,19 @@ void World::loop_event()
             }
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
             {
-                
+                //sf::Vector2i local_position = sf::Mouse::getPosition(*pGM->get_window());
+
+                //grid.place(1, sf::Vector2i(floor(local_position.x / 4), floor(local_position.y / 4)));
+                for(int i = 0; i < NUM_GRID; i++)
+                    {
+                        for(int j = 0; j < NUM_GRID; j++)
+                        {
+                            if(radius.verifiesInside(sf::Vector2f(i * 4, j * 4)))
+                            {
+                                grid.place(1, sf::Vector2i(i, j));
+                            }
+                        }
+                    }
             }
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
                 {
@@ -64,7 +76,7 @@ void World::loop_event()
                     {
                         for(int j = 0; j < NUM_GRID; j++)
                         {
-                            if(radius.verifiesInside(sf::Vector2f(i * 4, j * 4)))
+                            if(radius.verifiesInside(sf::Vector2f(i * 4, j * 4), true))
                             {
                                 grid.place(3, sf::Vector2i(i, j));
                             }

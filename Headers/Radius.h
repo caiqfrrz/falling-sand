@@ -6,6 +6,7 @@ class Radius
 {
 private:
     int size;
+    int count;
     sf::CircleShape body;
     Graphic_Manager* pGM;
 public:
@@ -16,5 +17,6 @@ public:
     void sizeUp();
     void sizeDown();
     bool verifiesInside(sf::Vector2f position);
+    bool verifiesInside(sf::Vector2f position, bool solid);
     int getRadius();
 };

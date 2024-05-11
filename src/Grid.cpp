@@ -20,16 +20,14 @@ Grid::~Grid()
 //Figure out order to do this shit correctly (bugged when placing large amount of particles, particles acting different for each side)
 void Grid::execute()
 {
-    for(int i = NUM_GRID - 1; i >= 0; i--)
-    {
-        for(int j = 0; j < NUM_GRID ; j++)
-        {
-            if(priv_grid[i][j] != 0)
-            {
-                grid[i][j]->update(sf::Vector2i(i, j));
-            }
-        }
-    }
+    for(int i = NUM_GRID - 1; i >= 0; i--) {
+      for(int j = 0; j < NUM_GRID; j++) {
+          if(grid[i][j] != nullptr) {
+              grid[i][j]->update(sf::Vector2i(i, j));
+          }
+      }
+  }
+
 }
 void Grid::draw(Graphic_Manager* pGM)
 {
@@ -80,7 +78,7 @@ bool Grid::checkBelow(sf::Vector2i pos_grid)
                     grid[i][j] = nullptr;
                     return true;
                 }
-                else if(grid[i-1][j+1] == 0)
+                if(grid[i-1][j+1] == 0)
                 {
                     grid[i - 1][j + 1] = grid[i][j];
                     grid[i][j] = nullptr;

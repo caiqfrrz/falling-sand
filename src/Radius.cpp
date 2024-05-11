@@ -2,6 +2,7 @@
 
 Radius::Radius(sf::Vector2f pos):
 size(40),
+count(10),
 pGM(Graphic_Manager::get_instance())
 {
     body.setRadius(size);
@@ -20,7 +21,7 @@ void Radius::execute()
 {
     sf::Vector2i localPosition = sf::Mouse::getPosition(*(pGM->get_window()));
     body.setPosition(sf::Vector2f(localPosition.x, localPosition.y));
-    pGM->get_window()->draw(body);
+    //pGM->get_window()->draw(body);
 }
 void Radius::sizeDown()
 {
@@ -44,6 +45,34 @@ int Radius::getRadius()
 }
 bool Radius::verifiesInside(sf::Vector2f position)
 {
+    int random = rand() % 2;
+    count -= random;
+
+    if(count == 20)
+    {
+        float distX = position.x - body.getPosition().x;
+        float distY = position.y - body.getPosition().y;
+
+        float distance = sqrt(pow(distX, 2) + pow(distY, 2));
+
+        count = 0;
+
+        if(distance < size)
+        {
+            return true;
+        }
+        else
+            return false;
+
+    }
+    else
+    {
+        count++;
+        return false;
+    }
+}
+bool Radius::verifiesInside(sf::Vector2f position, bool solid)
+{
     float distX = position.x - body.getPosition().x;
     float distY = position.y - body.getPosition().y;
 
@@ -55,6 +84,7 @@ bool Radius::verifiesInside(sf::Vector2f position)
     }
     else
         return false;
+
 }
 sf::CircleShape* Radius::getBody()
 {
