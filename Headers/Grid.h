@@ -15,7 +15,6 @@ class Grid
 {
 private:
     std::array<std::array<Element*, NUM_GRID + 1>, NUM_GRID> grid;
-    std::array<std::array<int, NUM_GRID + 1>, NUM_GRID> priv_grid;
 
 public:
     Grid();

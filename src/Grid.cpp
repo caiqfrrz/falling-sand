@@ -8,7 +8,6 @@ Grid::Grid()
         for(int j = 0; j < NUM_GRID; j++)
         {
             grid[i][j] = nullptr;
-            priv_grid[i][j] = 0;
         }
     }
     std::cout << "oiiii";
@@ -21,7 +20,7 @@ Grid::~Grid()
 void Grid::execute()
 {
     for(int i = NUM_GRID - 1; i >= 0; i--) {
-      for(int j = 0; j < NUM_GRID; j++) {
+      for(int j = 0; j < NUM_GRID - 1; j++) {
           if(grid[i][j] != nullptr) {
               grid[i][j]->update(sf::Vector2i(i, j));
           }
@@ -40,10 +39,7 @@ void Grid::draw(Graphic_Manager* pGM)
                 grid[i][j]->update_pos(sf::Vector2i(i, j));
                 pGM->draw(grid[i][j]);
                 grid[i][j]->reset();
-                priv_grid[i][j] = grid[i][j]->getId();
             }
-            else
-                priv_grid[i][j] = 0;
         }
     }
     
@@ -59,7 +55,7 @@ bool Grid::checkBelow(sf::Vector2i pos_grid)
         {
             //Verifies blocks below to see if the element wouldn't pass right into another because of gravity (gravity makes the elements travel more than one block per frame)
             int k = 1;
-            while(priv_grid[i][j+k+1] == 0 && k <= grid[i][j]->getVel() && j+k < NUM_GRID)
+            while(grid[i][j+k+1] == 0 && k <= grid[i][j]->getVel() && j+k < NUM_GRID)
             {
                 k++;
             }
@@ -78,7 +74,7 @@ bool Grid::checkBelow(sf::Vector2i pos_grid)
                     grid[i][j] = nullptr;
                     return true;
                 }
-                if(grid[i-1][j+1] == 0)
+                else if(grid[i-1][j+1] == 0)
                 {
                     grid[i - 1][j + 1] = grid[i][j];
                     grid[i][j] = nullptr;

@@ -1,0 +1,692 @@
+#pragma once
+
+
+#include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
+#include <SFML/Window/Mouse.hpp>
+
+#include "../Headers/Element.h"
+
+class Graphic_Manager
+{
+private:
+    sf::RenderWindow* window;
+    static Graphic_Manager* instance;
+    Graphic_Manager();
+public:
+    ~Graphic_Manager();
+    static Graphic_Manager* get_instance();
+    bool iswindow_opened();
+    sf::RenderWindow* get_window();
+    void draw(Element* el);
+};
+#include "../Managers/Graphic_Manager.h"
+#include <iostream>
+
+#define WIDTH_WINDOW 800
+#define HEIGHT_WINDOW 800
+
+Graphic_Manager* Graphic_Manager::instance(nullptr);
+
+Graphic_Manager::Graphic_Manager():
+window(new sf::RenderWindow(sf::VideoMode(WIDTH_WINDOW, HEIGHT_WINDOW), "Falling Sand"))
+{
+    window->setFramerateLimit(60);
+}
+Graphic_Manager::~Graphic_Manager()
+{
+    delete window;
+}
+
+Graphic_Manager* Graphic_Manager::get_instance()
+{
+    if(!instance)
+    {
+        instance = new Graphic_Manager();
+    }
+    return instance;
+}
+bool Graphic_Manager::iswindow_opened()
+{
+    if(window->isOpen())
+    {
+        return true;
+    }
+    else
+        return false;
+}
+sf::RenderWindow* Graphic_Manager::get_window()
+{
+    return window;
+}
+
+void Graphic_Manager::draw(Element* el)
+{
+    if(el != nullptr)
+    {
+        window->draw(*(el->get_body()));
+    }
+}
+#pragma once
+#include <SFML/Graphics.hpp>
+#include <cmath>
+
+class Grid;
+
+class Element
+{
+protected:
+    sf::RectangleShape body;
+    Grid* pGrid;
+    float velocity;
+    float energy;
+    float density;
+    bool isFalling;
+    bool hasMoved;
+    const int dispersionRate;
+    const int id;
+public:
+    Element(int dr, short int id, float dens, Grid* pG);
+    ~Element();
+    virtual void update(sf::Vector2i pos_grid) = 0;
+    void reset(){hasMoved = false;}
+    void update_pos(sf::Vector2i pos_grid){body.setPosition(sf::Vector2f(pos_grid.x * 4, (pos_grid.y) * 4));}
+    int getId(){return id;};
+    void update_vel();
+    int getDispersionRate();
+    float getDensity(){return density;}
+    void setFalling(bool f);
+    void setVel(int v){velocity = v;}
+    int getVel(){return round(velocity);}
+    int getEnergy(){return round(energy);}
+    sf::RectangleShape* get_body();
+};
+#include <iostream>
+#include "../Headers/Element.h"
+#include "../Headers/Grid.h"
+
+Element::Element(int dr, short int id,float dens, Grid* pG):
+body(sf::Vector2f(4, 4)), // Assuming default initialization or provide a suitable constructor
+pGrid(pG),
+velocity(0),
+energy(0),
+density(dens),
+isFalling(true),
+hasMoved(false),
+dispersionRate(dr),
+id(id)
+{
+    
+}
+Element::~Element()
+{
+
+}
+sf::RectangleShape* Element::get_body()
+{
+    return &body;
+}
+int Element::getDispersionRate()
+{
+    return dispersionRate;
+}
+void Element::setFalling(bool f)
+{
+    isFalling = f;
+}
+void Element::update_vel()
+{
+    if(isFalling)
+    {
+        velocity += .10;
+        energy = velocity;
+    }
+    else
+    {
+        energy -= .5;
+        velocity = 0;
+    }
+}
+#pragma once
+#include <iostream>
+#include <array>
+#include <SFML/Graphics.hpp>
+
+#include "../Managers/Graphic_Manager.h"
+#include "Sand.h"
+#include "Element.h"
+#include "Water.h"
+#include "Rock.h"
+
+#define NUM_GRID 200
+
+class Grid
+{
+private:
+    std::array<std::array<Element*, NUM_GRID + 1>, NUM_GRID> grid;
+
+public:
+    Grid();
+    ~Grid();
+    void execute();
+    void place(int id, sf::Vector2i position);
+    void draw(Graphic_Manager* pGM);
+    bool checkBelow(sf::Vector2i pos_grid);
+    void goSide(sf::Vector2i pos_grid, bool direction);
+};
+#include "../Headers/Grid.h"
+
+Grid::Grid()
+{
+    std::cout << "oiiii";
+    for(int i = 0; i < NUM_GRID; i++)
+    {
+        for(int j = 0; j < NUM_GRID; j++)
+        {
+            grid[i][j] = nullptr;
+        }
+    }
+    std::cout << "oiiii";
+}
+Grid::~Grid()
+{
+
+}
+//Figure out order to do this shit correctly (bugged when placing large amount of particles, particles acting different for each side)
+void Grid::execute()
+{
+    for(int i = NUM_GRID - 1; i >= 0; i--) {
+      for(int j = 0; j < NUM_GRID - 1; j++) {
+          if(grid[i][j] != nullptr) {
+              grid[i][j]->update(sf::Vector2i(i, j));
+          }
+      }
+  }
+
+}
+void Grid::draw(Graphic_Manager* pGM)
+{
+    for(int i = 0; i < NUM_GRID; i++)
+    {
+        for(int j = 0; j< NUM_GRID; j++)
+        {
+            if(grid[i][j] != nullptr)
+            {
+                grid[i][j]->update_pos(sf::Vector2i(i, j));
+                pGM->draw(grid[i][j]);
+                grid[i][j]->reset();
+            }
+        }
+    }
+    
+}
+
+bool Grid::checkBelow(sf::Vector2i pos_grid)
+{
+    int i = pos_grid.x;
+    int j = pos_grid.y;
+
+        //If block below is empty, continue downwards
+        if(grid[i][j + 1] == 0 && j < NUM_GRID)
+        {
+            //Verifies blocks below to see if the element wouldn't pass right into another because of gravity (gravity makes the elements travel more than one block per frame)
+            int k = 1;
+            while(grid[i][j+k+1] == 0 && k <= grid[i][j]->getVel() && j+k < NUM_GRID)
+            {
+                k++;
+            }
+            grid[i][j]->update_vel();
+            grid[i][j + k] = grid[i][j];
+            grid[i][j] = nullptr; 
+
+            return true;
+        }
+        //If block below isn`t empty, check diagonally
+        else if(grid[i][j+1] != 0)
+        {
+                if(grid[i+1][j+1] == 0)
+                {
+                    grid[i + 1][j + 1] = grid[i][j];
+                    grid[i][j] = nullptr;
+                    return true;
+                }
+                else if(grid[i-1][j+1] == 0)
+                {
+                    grid[i - 1][j + 1] = grid[i][j];
+                    grid[i][j] = nullptr;
+                    return true;
+                } 
+                if(grid[i][j+1]->getDensity() < grid[i][j]->getDensity())
+                {
+                    Element* temp = grid[i][j];
+                    grid[i][j] = grid[i][j + 1];
+                    grid[i][j + 1] = temp;
+                    
+                    temp = nullptr;
+                    delete temp;
+
+                    return true;
+                }
+            
+            return false;                
+        }
+        return false;
+        
+}
+void Grid::goSide(sf::Vector2i pos_grid, bool direction)
+{
+    int i = pos_grid.x;
+    int j = pos_grid.y;
+
+    if(direction)
+    {
+        if(grid[i + 1][j] == 0)
+        {
+            grid[i + 1][j] = grid[i][j];
+            grid[i][j] = nullptr;
+        }
+        else if(grid[i - 1][j] == 0)
+        {
+            grid[i - 1][j] = grid[i][j];
+            grid[i][j] = nullptr;
+        }
+    }
+    else
+    {
+        if(grid[i - 1][j] == 0)
+        {
+            grid[i - 1][j] = grid[i][j];
+            grid[i][j] = nullptr;
+        }
+        else if(grid[i + 1][j] == 0)
+        {
+            grid[i + 1][j] = grid[i][j];
+            grid[i][j] = nullptr;
+        }
+    }
+}
+
+void Grid::place(int id, sf::Vector2i position)
+{
+    if(grid[position.x][position.y] == nullptr)
+        switch(id)
+        {
+            case 1:
+            {
+                Sand* new_sand = new Sand(sf::Vector2f(position.x * 4, position.y * 4), this);
+                grid[position.x][position.y] = static_cast<Element*> (new_sand);
+                break;
+            }
+
+            case 2:
+            {
+                Water* new_water = new Water(sf::Vector2f(position.x * 4, position.y * 4), this);
+                grid[position.x][position.y] = static_cast<Element*> (new_water);
+                break;
+            }
+            case 3:
+            {
+                Rock* new_rock = new Rock(sf::Vector2f(position.x * 4, position.y * 4), this);
+                grid[position.x][position.y] = static_cast<Element*> (new_rock);
+                break;
+            }
+        }
+
+}
+#pragma once
+#include "../Managers/Graphic_Manager.h"
+#include <math.h>
+
+class Radius
+{
+private:
+    int size;
+    int count;
+    sf::CircleShape body;
+    Graphic_Manager* pGM;
+public:
+    Radius(sf::Vector2f pos);
+    ~Radius();
+    void execute();
+    sf::CircleShape* getBody();
+    void sizeUp();
+    void sizeDown();
+    bool verifiesInside(sf::Vector2f position);
+    bool verifiesInside(sf::Vector2f position, bool solid);
+    int getRadius();
+};
+#include "../Headers/Radius.h"
+
+Radius::Radius(sf::Vector2f pos):
+size(40),
+count(10),
+pGM(Graphic_Manager::get_instance())
+{
+    body.setRadius(size);
+    body.setPosition(pos);
+    body.setFillColor(sf::Color(0, 0, 0, 0));
+    body.setOutlineColor(sf::Color(255, 0, 0, 100));
+    body.setOutlineThickness(1.f);
+    body.setOrigin(size, size);
+
+}
+Radius::~Radius()
+{
+
+}
+void Radius::execute()
+{
+    sf::Vector2i localPosition = sf::Mouse::getPosition(*(pGM->get_window()));
+    body.setPosition(sf::Vector2f(localPosition.x, localPosition.y));
+    //pGM->get_window()->draw(body);
+}
+void Radius::sizeDown()
+{
+    if(size > 20)
+        size -= 10;
+    
+    body.setRadius(size);
+    body.setOrigin(size, size);
+}
+void Radius::sizeUp()
+{
+    if(size < 80)
+        size += 10;
+
+    body.setRadius(size);
+    body.setOrigin(size, size);
+}
+int Radius::getRadius()
+{
+    return size;
+}
+bool Radius::verifiesInside(sf::Vector2f position)
+{
+    int random = rand() % 2;
+    count -= random;
+
+    if(count == 20)
+    {
+        float distX = position.x - body.getPosition().x;
+        float distY = position.y - body.getPosition().y;
+
+        float distance = sqrt(pow(distX, 2) + pow(distY, 2));
+
+        count = 0;
+
+        if(distance < size)
+        {
+            return true;
+        }
+        else
+            return false;
+
+    }
+    else
+    {
+        count++;
+        return false;
+    }
+}
+bool Radius::verifiesInside(sf::Vector2f position, bool solid)
+{
+    float distX = position.x - body.getPosition().x;
+    float distY = position.y - body.getPosition().y;
+
+    float distance = sqrt(pow(distX, 2) + pow(distY, 2));
+
+    if(distance < size)
+    {
+        return true;
+    }
+    else
+        return false;
+
+}
+sf::CircleShape* Radius::getBody()
+{
+    return &body;
+}
+#pragma once
+#include "Element.h"
+
+class Rock : public Element
+{
+private:
+
+public:
+    Rock(sf::Vector2f pos, Grid* pG);
+    ~Rock();
+    void update(sf::Vector2i pos_grid);
+};
+#include "../Headers/Rock.h"
+
+Rock::Rock(sf::Vector2f pos, Grid* pG):
+Element(0, 3, 10.f, pG)
+{
+    body.setFillColor(sf::Color(128, 128, 128));
+    body.setPosition(pos);
+}
+Rock::~Rock()
+{
+
+}
+void Rock::update(sf::Vector2i pos_grid)
+{
+
+}
+#pragma once
+#include "Element.h"
+
+class Sand : public Element
+{
+private:
+    bool direction;
+public:
+    Sand(sf::Vector2f pos, Grid* pG = nullptr);
+    ~Sand();
+    void update(sf::Vector2i pos_grid);
+};
+#include "../Headers/Sand.h"
+#include "../Headers/Grid.h"
+
+Sand::Sand(sf::Vector2f pos, Grid* pG):
+Element(1, 1, 1.4, pG)
+{
+    // Define an array of yellowish sand colors
+    sf::Color sandColors[8] = {
+        sf::Color(245, 222, 179), // Wheat
+        sf::Color(240, 230, 140), // Khaki
+        sf::Color(222, 205, 140), // Darker
+        sf::Color(238, 232, 170), // PaleGoldenRod
+        sf::Color(255, 233, 171), // Light Pale Yellow
+    };
+
+    // Randomly select a color from the array
+    int colorIndex = rand() % 4;
+    body.setFillColor(sandColors[colorIndex]);
+
+    body.setPosition(pos);
+}
+
+Sand::~Sand()
+{
+
+}
+
+void Sand::update(sf::Vector2i pos_grid)
+{
+    if(!hasMoved)
+        pGrid->checkBelow(pos_grid);
+
+    hasMoved = true;
+}
+#pragma once
+
+#include "Element.h"
+
+class Water : public Element
+{
+private:
+    bool direction;
+public:
+    Water(sf::Vector2f pos, Grid* pG = nullptr);
+    ~Water();
+    void update(sf::Vector2i pos_grid);
+
+};
+#include "../Headers/Water.h"
+#include "../Headers/Grid.h"
+#include <stdlib.h>
+
+Water::Water(sf::Vector2f pos, Grid* pG):
+Element(3, 2, 1.0, pG)
+{
+    int random = (int)rand() % 2;
+    if(random)
+        direction = true;
+    else
+        direction = false;
+
+    body.setPosition(pos);
+    body.setFillColor(sf::Color::Blue);
+}
+Water::~Water()
+{
+
+}
+void Water::update(sf::Vector2i pos_grid)
+{
+    if(!hasMoved)
+        if(!pGrid->checkBelow(pos_grid))
+            pGrid->goSide(pos_grid, false);
+
+    hasMoved = true;
+}
+#pragma once
+#include "../Managers/Graphic_Manager.h"
+#include "Grid.h"
+#include "Radius.h"
+
+
+#include <iostream>
+
+
+class World
+{
+private:
+    Graphic_Manager* pGM;
+    Grid grid;
+    Radius radius;
+public:
+    World();
+    ~World();
+    void execute();
+    void loop_event();
+};
+#include <iostream>
+#include <cmath>
+#include "../Headers/World.h"
+
+World::World():
+pGM(Graphic_Manager::get_instance()),
+radius(sf::Vector2f(NUM_GRID/2, NUM_GRID/2))
+    {
+        grid = Grid();
+        execute();
+    }
+
+World::~World()
+    {
+        
+    }
+
+void World::execute()
+{
+    std::cout << "oiiii";
+        while(pGM->iswindow_opened())
+        {
+            pGM->get_window()->clear();
+            loop_event();
+            grid.execute();
+            grid.draw(pGM);
+            radius.execute();
+
+
+            pGM->get_window()->display();
+        }
+}
+void World::loop_event()
+{
+    sf::Event event;
+
+            while(pGM->get_window()->pollEvent(event))
+            {
+                if(event.type == sf::Event::Closed)
+                    pGM->get_window()->close();
+
+            }
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+            {
+                //sf::Vector2i local_position = sf::Mouse::getPosition(*pGM->get_window());
+
+                //grid.place(1, sf::Vector2i(floor(local_position.x / 4), floor(local_position.y / 4)));
+                for(int i = 0; i < NUM_GRID; i++)
+                    {
+                        for(int j = 0; j < NUM_GRID; j++)
+                        {
+                            if(radius.verifiesInside(sf::Vector2f(i * 4, j * 4)))
+                            {
+                                grid.place(1, sf::Vector2i(i, j));
+                            }
+                        }
+                    }
+            }
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+                {
+                    for(int i = 0; i < NUM_GRID; i++)
+                    {
+                        for(int j = 0; j < NUM_GRID; j++)
+                        {
+                            if(radius.verifiesInside(sf::Vector2f(i * 4, j * 4)))
+                            {
+                                grid.place(2, sf::Vector2i(i, j));
+                            }
+                        }
+                    }
+                }
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+            {
+                {
+                    for(int i = 0; i < NUM_GRID; i++)
+                    {
+                        for(int j = 0; j < NUM_GRID; j++)
+                        {
+                            if(radius.verifiesInside(sf::Vector2f(i * 4, j * 4), true))
+                            {
+                                grid.place(3, sf::Vector2i(i, j));
+                            }
+                        }
+                    }
+                }
+            }
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+            {
+                radius.sizeUp();
+            }
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+            {
+                radius.sizeDown();
+            }
+            
+}
+main.cpp:
+#include "Headers/World.h"
+
+int main()
+{
+    std::cout << "aaaaaa";
+    World game;
+    
+    return 0;
+}
