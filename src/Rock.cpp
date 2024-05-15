@@ -1,10 +1,9 @@
 #include "../Headers/Rock.h"
 
 Rock::Rock(sf::Vector2f pos, Grid* pG):
-Element(0, 3, 10.f, pG)
+Element(pos, 0, 3, 10.f, pG)
 {
     body.setFillColor(sf::Color(128, 128, 128));
-    body.setPosition(pos);
 }
 Rock::~Rock()
 {

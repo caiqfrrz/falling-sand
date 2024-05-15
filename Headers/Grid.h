@@ -23,5 +23,8 @@ public:
     void place(int id, sf::Vector2i position);
     void draw(Graphic_Manager* pGM);
     bool checkBelow(sf::Vector2i pos_grid);
-    void goSide(sf::Vector2i pos_grid, bool direction);
+    bool checkDiagonaly(sf::Vector2i pos_grid);
+    bool goSide(sf::Vector2i pos_grid);
+    bool checkDensity(sf::Vector2i pos_grid);
+    void swapCells(sf::Vector2i pos_grid1, sf::Vector2i pos_grid);
 };

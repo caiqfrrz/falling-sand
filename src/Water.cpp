@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 Water::Water(sf::Vector2f pos, Grid* pG):
-Element(3, 2, 1.0, pG)
+Element(pos, 3, 2, 1.0, pG)
 {
     int random = (int)rand() % 2;
     if(random)
@@ -11,7 +11,6 @@ Element(3, 2, 1.0, pG)
     else
         direction = false;
 
-    body.setPosition(pos);
     body.setFillColor(sf::Color::Blue);
 }
 Water::~Water()
@@ -21,8 +20,14 @@ Water::~Water()
 void Water::update(sf::Vector2i pos_grid)
 {
     if(!hasMoved)
-        if(!pGrid->checkBelow(pos_grid))
-            pGrid->goSide(pos_grid, false);
+    {
+        if(!checkBelow())
+        {        
+            if(!checkDiagonaly())
+                goSide();
+        }
+            
+    }
 
     hasMoved = true;
 }

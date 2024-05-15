@@ -66,70 +66,66 @@ bool Grid::checkBelow(sf::Vector2i pos_grid)
             return true;
         }
         //If block below isn`t empty, check diagonally
-        else if(grid[i][j+1] != 0)
-        {
-                if(grid[i+1][j+1] == 0)
-                {
-                    grid[i + 1][j + 1] = grid[i][j];
-                    grid[i][j] = nullptr;
-                    return true;
-                }
-                else if(grid[i-1][j+1] == 0)
-                {
-                    grid[i - 1][j + 1] = grid[i][j];
-                    grid[i][j] = nullptr;
-                    return true;
-                } 
-                if(grid[i][j+1]->getDensity() < grid[i][j]->getDensity())
-                {
-                    Element* temp = grid[i][j];
-                    grid[i][j] = grid[i][j + 1];
-                    grid[i][j + 1] = temp;
-                    
-                    temp = nullptr;
-                    delete temp;
-
-                    return true;
-                }
-            
-            return false;                
-        }
+    
         return false;
         
 }
-void Grid::goSide(sf::Vector2i pos_grid, bool direction)
+bool Grid::checkDiagonaly(sf::Vector2i pos_grid)
 {
     int i = pos_grid.x;
     int j = pos_grid.y;
 
-    if(direction)
+    if(grid[i+1][j+1] == nullptr)
     {
-        if(grid[i + 1][j] == 0)
-        {
-            grid[i + 1][j] = grid[i][j];
-            grid[i][j] = nullptr;
-        }
-        else if(grid[i - 1][j] == 0)
-        {
-            grid[i - 1][j] = grid[i][j];
-            grid[i][j] = nullptr;
-        }
+        grid[i+1][j+1] = grid[i][j];
+        grid[i][j] = nullptr;
+        return true;
     }
-    else
+    else if(grid[i-1][j+1] == nullptr)
     {
-        if(grid[i - 1][j] == 0)
-        {
-            grid[i - 1][j] = grid[i][j];
-            grid[i][j] = nullptr;
-        }
-        else if(grid[i + 1][j] == 0)
-        {
-            grid[i + 1][j] = grid[i][j];
-            grid[i][j] = nullptr;
-        }
+        grid[i-1][j+1] = grid[i][j];
+        grid[i][j] = nullptr;
+        return true;
     }
-}
 
+    return false;
+}
+bool Grid::goSide(sf::Vector2i pos_grid)
+{
+    int i = pos_grid.x;
+    int j = pos_grid.y;
+
+    if(grid[i + 1][j] == nullptr)
+    {
+        grid[i+1][j] = grid[i][j];
+        grid[i][j] = nullptr;
+        return true;
+    }
+    else if(grid[i - 1][j] == nullptr)
+    {
+        grid[i-1][j] = grid[i][j];
+        grid[i][j] = nullptr;
+        return true;
+    }
+    return false;
+}
+bool Grid::checkDensity(sf::Vector2i pos_grid)
+{
+    if(grid[pos_grid.x][pos_grid.y]->getDensity() > grid[pos_grid.x][pos_grid.y + 1]->getDensity())
+    {
+        swapCells(pos_grid, sf::Vector2i(pos_grid.x, pos_grid.y + 1));
+        grid[pos_grid.x][pos_grid.y + 1]->update(sf::Vector2i(0, 0));
+        return true;
+    }
+    return false;
+}
+void Grid::swapCells(sf::Vector2i pos_grid1, sf::Vector2i pos_grid)
+{
+    Element* temp = grid[pos_grid.x][pos_grid.y];
+    grid[pos_grid.x][pos_grid.y] = grid[pos_grid1.x][pos_grid1.y];
+    grid[pos_grid1.x][pos_grid1.y] = temp;
+    //delete temp;
+}
 void Grid::place(int id, sf::Vector2i position)
 {
     if(grid[position.x][position.y] == nullptr)

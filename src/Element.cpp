@@ -2,8 +2,9 @@
 #include "../Headers/Element.h"
 #include "../Headers/Grid.h"
 
-Element::Element(int dr, short int id,float dens, Grid* pG):
-body(sf::Vector2f(4, 4)), // Assuming default initialization or provide a suitable constructor
+Element::Element(sf::Vector2f pos, int dr, short int id,float dens, Grid* pG):
+body(sf::Vector2f(4, 4)), 
+current_pos(sf::Vector2i(pos.x/4, pos.y/4)),
 pGrid(pG),
 velocity(0),
 energy(0),
@@ -13,7 +14,7 @@ hasMoved(false),
 dispersionRate(dr),
 id(id)
 {
-    
+    body.setPosition(pos);
 }
 Element::~Element()
 {
@@ -43,4 +44,20 @@ void Element::update_vel()
         energy -= .5;
         velocity = 0;
     }
+}
+bool Element::checkBelow()
+{
+    return pGrid->checkBelow(current_pos);
+}
+bool Element::checkDiagonaly()
+{
+    return pGrid->checkDiagonaly(current_pos);
+}
+bool Element::goSide()
+{
+    return pGrid->goSide(current_pos);
+}
+bool Element::checkDensity()
+{
+    return pGrid->checkDensity(current_pos);
 }
