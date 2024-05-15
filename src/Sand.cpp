@@ -28,11 +28,15 @@ void Sand::update(sf::Vector2i pos_grid)
     if(!hasMoved)
         if(!checkBelow())
         {
-            if(checkDensity())
+           // if(checkDensity())
+           // {
+              // body.setFillColor(sf::Color(140, 129, 62));
+            //}
+            if(!checkDiagonaly())
             {
-                body.setFillColor(sf::Color(140, 129, 62));
+                std::cout << "hello";
+                stay();
             }
-            checkDiagonaly();
         }
 
     hasMoved = true;

@@ -15,6 +15,7 @@ class Grid
 {
 private:
     std::array<std::array<Element*, NUM_GRID + 1>, NUM_GRID> grid;
+    std::array<std::array<Element*, NUM_GRID + 1>, NUM_GRID> next;
 
 public:
     Grid();
@@ -27,4 +28,6 @@ public:
     bool goSide(sf::Vector2i pos_grid);
     bool checkDensity(sf::Vector2i pos_grid);
     void swapCells(sf::Vector2i pos_grid1, sf::Vector2i pos_grid);
+    void swapAndClear();
+    void stay(sf::Vector2i pos_grid);
 };

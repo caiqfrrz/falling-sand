@@ -36,5 +36,6 @@ public:
     bool checkDiagonaly();
     bool goSide();
     bool checkDensity();
+    void stay();
     sf::RectangleShape* get_body();
 };

@@ -61,3 +61,7 @@ bool Element::checkDensity()
 {
     return pGrid->checkDensity(current_pos);
 }
+void Element::stay()
+{
+    pGrid->stay(current_pos);
+}

@@ -8,9 +8,9 @@ Grid::Grid()
         for(int j = 0; j < NUM_GRID; j++)
         {
             grid[i][j] = nullptr;
+            next[i][j] = nullptr;
         }
     }
-    std::cout << "oiiii";
 }
 Grid::~Grid()
 {
@@ -25,8 +25,19 @@ void Grid::execute()
               grid[i][j]->update(sf::Vector2i(i, j));
           }
       }
-  }
-
+    }
+    swapAndClear();
+}
+void Grid::swapAndClear()
+{
+    for(int i = 0; i < NUM_GRID; i++)
+    {
+        for(int j = 0; j < NUM_GRID; j++)
+        {
+            grid[i][j] = next[i][j];
+            next[i][j] = nullptr;
+        }
+    }
 }
 void Grid::draw(Graphic_Manager* pGM)
 {
@@ -51,23 +62,21 @@ bool Grid::checkBelow(sf::Vector2i pos_grid)
     int j = pos_grid.y;
 
         //If block below is empty, continue downwards
-        if(grid[i][j + 1] == 0 && j < NUM_GRID)
+        if(next[i][j + 1] == nullptr && j < NUM_GRID)
         {
             //Verifies blocks below to see if the element wouldn't pass right into another because of gravity (gravity makes the elements travel more than one block per frame)
             int k = 1;
-            while(grid[i][j+k+1] == 0 && k <= grid[i][j]->getVel() && j+k < NUM_GRID)
+            while(next[i][j+k+1] == 0 && k <= grid[i][j]->getVel() && j+k < NUM_GRID)
             {
                 k++;
             }
             grid[i][j]->update_vel();
-            grid[i][j + k] = grid[i][j];
-            grid[i][j] = nullptr; 
+            next[i][j + k] = grid[i][j];
 
             return true;
         }
-        //If block below isn`t empty, check diagonally
-    
-        return false;
+        else if(next[i][j+1] != nullptr)
+            return false;
         
 }
 bool Grid::checkDiagonaly(sf::Vector2i pos_grid)
@@ -75,36 +84,32 @@ bool Grid::checkDiagonaly(sf::Vector2i pos_grid)
     int i = pos_grid.x;
     int j = pos_grid.y;
 
-    if(grid[i+1][j+1] == nullptr)
+    if(next[i+1][j+1] == nullptr)
     {
-        grid[i+1][j+1] = grid[i][j];
-        grid[i][j] = nullptr;
+        next[i+1][j+1] = grid[i][j];
         return true;
     }
-    else if(grid[i-1][j+1] == nullptr)
+    else if(next[i-1][j+1] == nullptr)
     {
-        grid[i-1][j+1] = grid[i][j];
-        grid[i][j] = nullptr;
+        next[i-1][j+1] = grid[i][j];
         return true;
     }
-
-    return false;
+    else
+        return false;
 }
 bool Grid::goSide(sf::Vector2i pos_grid)
 {
     int i = pos_grid.x;
     int j = pos_grid.y;
 
-    if(grid[i + 1][j] == nullptr)
+    if(next[i - 1][j] == nullptr)
     {
-        grid[i+1][j] = grid[i][j];
-        grid[i][j] = nullptr;
+        next[i-1][j] = grid[i][j];
         return true;
     }
-    else if(grid[i - 1][j] == nullptr)
+    else if(next[i + 1][j] == nullptr)
     {
-        grid[i-1][j] = grid[i][j];
-        grid[i][j] = nullptr;
+        next[i+1][j] = grid[i][j];
         return true;
     }
     return false;
@@ -118,6 +123,10 @@ bool Grid::checkDensity(sf::Vector2i pos_grid)
         return true;
     }
     return false;
+}
+void Grid::stay(sf::Vector2i pos_grid)
+{
+    next[pos_grid.x][pos_grid.y] = grid[pos_grid.x][pos_grid.y];
 }
 void Grid::swapCells(sf::Vector2i pos_grid1, sf::Vector2i pos_grid)
 {

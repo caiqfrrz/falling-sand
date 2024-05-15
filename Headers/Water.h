@@ -6,6 +6,7 @@ class Water : public Element
 {
 private:
     bool direction;
+    bool stationary;
 public:
     Water(sf::Vector2f pos, Grid* pG = nullptr);
     ~Water();
